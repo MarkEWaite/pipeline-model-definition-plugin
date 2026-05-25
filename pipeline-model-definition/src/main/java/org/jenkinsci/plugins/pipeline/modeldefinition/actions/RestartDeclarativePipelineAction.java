@@ -93,8 +93,15 @@ public class RestartDeclarativePipelineAction implements Action {
         if (owner == null) {
             return null;
         }
-        FlowExecution exec = owner.getOrNull();
-        return exec instanceof CpsFlowExecution ? (CpsFlowExecution) exec : null;
+        // Use get() rather than getOrNull(): for a completed build loaded from disk (e.g. after restart),
+        // the FlowExecution is not in memory, but this action is rendered on the build's own page where
+        // loading the execution is appropriate.
+        try {
+            FlowExecution exec = owner.get();
+            return exec instanceof CpsFlowExecution ? (CpsFlowExecution) exec : null;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     @Exported
