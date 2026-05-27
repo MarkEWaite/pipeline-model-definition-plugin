@@ -98,7 +98,7 @@ public class RestartDeclarativePipelineAction implements Action {
         // loading the execution is appropriate.
         try {
             FlowExecution exec = owner.get();
-            return exec instanceof CpsFlowExecution ? (CpsFlowExecution) exec : null;
+            return exec instanceof CpsFlowExecution cfe ? cfe : null;
         } catch (IOException e) {
             return null;
         }
