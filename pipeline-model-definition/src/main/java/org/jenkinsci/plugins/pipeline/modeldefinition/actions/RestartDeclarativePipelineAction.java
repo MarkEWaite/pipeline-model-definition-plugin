@@ -61,9 +61,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ExportedBean
 public class RestartDeclarativePipelineAction implements Action {
+
+    private static final Logger LOGGER = Logger.getLogger(RestartDeclarativePipelineAction.class.getName());
 
     private final Run run;
 
@@ -93,8 +97,16 @@ public class RestartDeclarativePipelineAction implements Action {
         if (owner == null) {
             return null;
         }
-        FlowExecution exec = owner.getOrNull();
-        return exec instanceof CpsFlowExecution ? (CpsFlowExecution) exec : null;
+        // Use get() rather than getOrNull(): for a completed build loaded from disk (e.g. after restart),
+        // the FlowExecution is not in memory, but this action is rendered on the build's own page where
+        // loading the execution is appropriate.
+        try {
+            FlowExecution exec = owner.get();
+            return exec instanceof CpsFlowExecution cfe ? cfe : null;
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, e, () -> "Failed to load metadata of " + run);
+            return null;
+        }
     }
 
     @Exported
