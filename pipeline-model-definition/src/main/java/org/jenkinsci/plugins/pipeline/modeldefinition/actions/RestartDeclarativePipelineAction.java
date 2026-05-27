@@ -61,9 +61,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ExportedBean
 public class RestartDeclarativePipelineAction implements Action {
+
+    private static final Logger LOGGER = Logger.getLogger(RestartDeclarativePipelineAction.class.getName());
 
     private final Run run;
 
@@ -100,6 +104,7 @@ public class RestartDeclarativePipelineAction implements Action {
             FlowExecution exec = owner.get();
             return exec instanceof CpsFlowExecution cfe ? cfe : null;
         } catch (IOException e) {
+            LOGGER.log(Level.FINE, "Exception while fetching FlowExecution for " + run + ", returning null", e);
             return null;
         }
     }
