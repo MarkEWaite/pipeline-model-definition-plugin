@@ -104,7 +104,7 @@ public class RestartDeclarativePipelineAction implements Action {
             FlowExecution exec = owner.get();
             return exec instanceof CpsFlowExecution cfe ? cfe : null;
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, "Exception while fetching FlowExecution for " + run + ", returning null", e);
+            LOGGER.log(Level.WARNING, e, () -> "Failed to load metadata of " + run);
             return null;
         }
     }
